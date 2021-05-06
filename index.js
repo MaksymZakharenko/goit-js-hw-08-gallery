@@ -33,14 +33,20 @@ const closeModal = () => {
   refs.lightboxImg.alt = "";
 };
 
+const openModal = () => {
+  refs.lightbox.classList.add("is-open");
+  refs.lightboxImg.src = event.target.dataset.source;
+  refs.lightboxImg.alt = event.target.alt;
+};
+
+
+
 refs.gallery.insertAdjacentHTML("beforeend", refs.listImages);
 
 refs.gallery.addEventListener("click", (event) => {
   event.preventDefault();
   if (event.target.tagName !== "IMG") return;
-  refs.lightbox.classList.add("is-open");
-  refs.lightboxImg.src = event.target.dataset.source;
-  refs.lightboxImg.alt = event.target.alt;
+    openModal();
 });
 
 refs.lightbox.addEventListener("click", (event) => {
