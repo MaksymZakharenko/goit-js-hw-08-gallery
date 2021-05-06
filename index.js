@@ -8,7 +8,7 @@ const refs = {
 
   listImages: galleryItems
     .map(
-      (image) => `
+      (image, index) => `
     <li class="gallery__item">
       <a
       class="gallery__link"
@@ -19,6 +19,7 @@ const refs = {
           src="${image.preview}"
           data-source="${image.original}"
           alt="${image.description}"
+          data-index="${index}"
         />
       </a>
           </li >
@@ -27,37 +28,35 @@ const refs = {
     .join(""),
 };
 
+let currentIndex = 0;
+
+const apdateFn = (src = "", alt = "") => {
+  refs.lightboxImg.src = src;
+  refs.lightboxImg.alt = alt;
+};
+
 const closeModal = () => {
   refs.lightbox.classList.remove("is-open");
-  refs.lightboxImg.src = "";
-  refs.lightboxImg.alt = "";
+  apdateFn();
 };
 
-const openModal = () => {
+const openModal = (enent) => {
+  currentIndex = +event.target.dataset.index;
+  console.log(event.target.dataset.index);
   refs.lightbox.classList.add("is-open");
-  refs.lightboxImg.src = event.target.dataset.source;
-  refs.lightboxImg.alt = event.target.alt;
+  apdateFn(event.target.dataset.source, event.target.alt);
 };
-
-
 
 refs.gallery.insertAdjacentHTML("beforeend", refs.listImages);
 
 refs.gallery.addEventListener("click", (event) => {
   event.preventDefault();
   if (event.target.tagName !== "IMG") return;
-    openModal();
+  openModal();
 });
 
 refs.lightbox.addEventListener("click", (event) => {
-  if (event.target.tagName === "BUTTON") {
-    closeModal();
-  }
-  return;
-});
-
-refs.lightboxFon.addEventListener("click", (event) => {
-  if (event.target.tagName === "DIV") {
+  if (event.target.tagName === "BUTTON" || event.target.tagName === "DIV") {
     closeModal();
   }
   return;
@@ -66,6 +65,24 @@ refs.lightboxFon.addEventListener("click", (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.code === "Escape") {
     closeModal();
+    return;
   }
-  return;
+  if (event.code === "ArrowRight") {
+    currentIndex += 1;
+    if (currentIndex > galleryItems.length - 1) {
+      currentIndex = 0;
+    }
+    console.log("ArrowRight ", currentIndex);
+  }
+  if (event.code === "ArrowLeft") {
+    currentIndex -= 1;
+    if (currentIndex < 0) {
+      currentIndex = galleryItems.length - 1;
+    }
+    console.log("ArrowLeft ", currentIndex);
+  }
+  apdateFn(
+    galleryItems[currentIndex].original,
+    galleryItems[currentIndex].description
+  );
 });
